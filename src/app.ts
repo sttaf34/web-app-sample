@@ -3,6 +3,7 @@
 
 import * as express from "express"
 import { Request, Response, NextFunction } from "express"
+import * as session from "express-session"
 import * as helmet from "helmet"
 import * as createHttpError from "http-errors"
 import * as listEndpoints from "express-list-endpoints"
@@ -16,13 +17,18 @@ import localStrategy from "./utilities/local-strategy"
 import index from "./routes/index"
 import users from "./routes/users"
 
+import connectFlash = require("connect-flash")
+
 const main = async (): Promise<void> => {
   const app = express()
 
   // request.body でデータを受け取る設定
   app.use(express.urlencoded({ extended: true }))
 
+  app.use(connectFlash())
   app.use(helmet())
+
+  // View設定
   app.set("views", path.join(__dirname, "views"))
   app.set("view engine", "pug")
 
@@ -31,9 +37,34 @@ const main = async (): Promise<void> => {
   const connection = await createConnection(option)
   BaseEntity.useConnection(connection)
 
+  // セッション設定
+  app.use(
+    session({
+      resave: false,
+      saveUninitialized: false,
+      secret: "secret"
+    })
+  )
+
   // 認証設定
   app.use(passport.initialize())
+  app.use(passport.session())
   passport.use(localStrategy())
+
+  passport.serializeUser(
+    (user: string, done: (error: Error | null, id: string) => void): void => {
+      // セッションにユーザ情報を保存したときに呼ばれる
+      console.log("passport.serializeUser")
+      done(null, user)
+    }
+  )
+  passport.deserializeUser(
+    (user: string, done: (error: Error | null, id: string) => void): void => {
+      // セッションからユーザ情報を取り出すとき都度呼ばれる
+      console.log("passport.deserializeUser")
+      done(null, user)
+    }
+  )
 
   // ルーティング設定
   app.use("/", index)

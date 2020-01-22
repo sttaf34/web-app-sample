@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import * as express from "express"
 import {
   Strategy,
@@ -20,11 +18,17 @@ const localStrategy = (): Strategy => {
     req: express.Request,
     username: string,
     password: string,
-    done: (error: any, user?: any, options?: IVerifyOptions) => void
+    done: (
+      error: Error | null,
+      user: string | boolean,
+      options?: IVerifyOptions
+    ) => void
   ): void => {
     process.nextTick((): void => {
       if (username === "test" && password === "test") {
-        return done(null, username)
+        // 認証OKであればdoneにユーザ情報を渡すような形
+        // passport.serializeUserの中のdoneに渡る
+        return done(null, username, { message: "認証しました" })
       }
       return done(null, false, { message: "何かが間違っています" })
     })

@@ -4,21 +4,34 @@ import { authenticate } from "passport"
 const router = Router()
 
 router.get("/", (request: Request, response: Response) => {
-  response.render("index")
+  const message = request.flash()
+  response.render("index", { user: request.user, message: message.success })
 })
 
 router.get("/login", (request: Request, response: Response) => {
-  response.render("login")
+  if (request.user) {
+    response.redirect("/")
+  }
+
+  const message = request.flash()
+  response.render("login", { message: message.error })
 })
 
 router.post(
   "/login",
   authenticate("local", {
     successRedirect: "/",
+    successFlash: true,
     failureRedirect: "/login",
-    session: false
+    failureFlash: true,
+    session: true
   })
 )
+
+router.get("/logout", (request: Request, response: Response) => {
+  request.logout()
+  response.redirect("/")
+})
 
 router.get("/favicon.ico", (request: Request, response: Response) => {
   response.send()

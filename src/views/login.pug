@@ -4,6 +4,10 @@ html(lang="ja")
     meta(charset="UTF-8")
     title ログイン
   body
+    if(message)
+      span #{message}
+      br
+
     span ログイン
     form(method="post" action="/login")
       input(type="text" name="username" value="")
