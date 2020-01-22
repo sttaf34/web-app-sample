@@ -1,0 +1,18 @@
+doctype html
+html(lang="ja")
+  head
+    meta(charset="UTF-8")
+    title ホーム
+  body
+    if(message)
+      span #{message}
+      br
+
+    if(user)
+      span こんにちは #{user} さん
+      br
+      a(href="/logout") ログアウト
+    else
+      span こんにちは匿名さん
+      br
+      a(href="/login") ログインページへ
