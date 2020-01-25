@@ -17,11 +17,12 @@ jobs:
       - checkout
       - deploy:
           name: Deploy to Heroku
-          command: |
-            docker login -u _ -p $HEROKU_API_KEY registry.heroku.com
-            curl https://cli-assets.heroku.com/install.sh | sh
-            heroku container:push web -a $HEROKU_APP_NAME
-            heroku container:release web -a $HEROKU_APP_NAME
+          command: exit 0
+          # command: |
+          #   docker login -u _ -p $HEROKU_API_KEY registry.heroku.com
+          #   curl https://cli-assets.heroku.com/install.sh | sh
+          #   heroku container:push web -a $HEROKU_APP_NAME
+          #   heroku container:release web -a $HEROKU_APP_NAME
 
 workflows:
   version: 2
