@@ -5,6 +5,7 @@ import {
   VerifyFunctionWithRequest,
   IVerifyOptions
 } from "passport-local"
+import User from "../entities/user"
 
 const localStrategy = (): Strategy => {
   const option: IStrategyOptionsWithRequest = {
@@ -25,12 +26,16 @@ const localStrategy = (): Strategy => {
     ) => void
   ): void => {
     process.nextTick((): void => {
-      if (username === "test" && password === "test") {
-        // 認証OKであればdoneにユーザ情報を渡すような形
-        // passport.serializeUserの中のdoneに渡る
-        return done(null, username, { message: "認証しました" })
-      }
-      return done(null, false, { message: "何かが間違っています" })
+      User.findOneByNameAndPassword(username, password)
+        .then((user: User | undefined) => {
+          if (user === undefined) {
+            return done(null, false, { message: "見つかりませんでした" })
+          }
+          return done(null, user.name, { message: "認証しました" })
+        })
+        .catch((error: Error) => {
+          return done(error, false, { message: "何かが間違っています" })
+        })
     })
   }
 
