@@ -8,6 +8,7 @@ import * as helmet from "helmet"
 import * as createHttpError from "http-errors"
 import * as listEndpoints from "express-list-endpoints"
 import * as path from "path"
+import * as dotenv from "dotenv"
 
 import { getConnectionOptions, createConnection, BaseEntity } from "typeorm"
 
@@ -20,6 +21,9 @@ import users from "./routes/users"
 import connectFlash = require("connect-flash")
 
 const main = async (): Promise<void> => {
+  // 環境変数読み込み
+  dotenv.config()
+
   const app = express()
 
   // request.body でデータを受け取る設定
@@ -80,6 +84,7 @@ const main = async (): Promise<void> => {
   app.listen(port, (): void => {
     console.log(`listening on port ${port}!`)
     console.log(listEndpoints(app))
+    console.log(process.env)
   })
 }
 
