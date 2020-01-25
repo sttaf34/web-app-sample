@@ -29,6 +29,11 @@
     "migration:run": "npx ts-node $(npm bin)/typeorm migration:run",
     "migration:revert": "npx ts-node $(npm bin)/typeorm migration:revert"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn eslint"
+    }
+  },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
     "@types/connect-flash": "^0.0.35",
@@ -54,6 +59,7 @@
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react": "^7.17.0",
     "eslint-plugin-react-hooks": "1.7.0",
+    "husky": "^4.0.10",
     "jest": "^24.9.0",
     "prettier": "^1.19.1",
     "ts-jest": "^24.3.0",
