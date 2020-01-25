@@ -3,15 +3,19 @@ services:
   db:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: sample
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
     ports:
       - "3306:3306"
+
   application:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
     command: ./wait.sh npx ts-node-dev --poll src/app.ts
     volumes:
       - ./src:/home/circleci/application/src
