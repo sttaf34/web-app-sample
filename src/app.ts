@@ -80,6 +80,7 @@ const main = async (): Promise<void> => {
   app.listen(port, (): void => {
     console.log(`listening on port ${port}!`)
     console.log(listEndpoints(app))
+    console.log(process.env)
   })
 }
 
