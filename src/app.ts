@@ -13,9 +13,11 @@ import { getConnectionOptions, createConnection, BaseEntity } from "typeorm"
 
 import * as passport from "passport"
 import localStrategy from "./utilities/local-strategy"
+import githubStrategy from "./utilities/github-strategy"
 
 import index from "./routes/index"
 import users from "./routes/users"
+import auth from "./routes/auth"
 
 import connectFlash = require("connect-flash")
 
@@ -50,6 +52,7 @@ const main = async (): Promise<void> => {
   app.use(passport.initialize())
   app.use(passport.session())
   passport.use(localStrategy())
+  passport.use(githubStrategy())
 
   passport.serializeUser(
     (user: string, done: (error: Error | null, id: string) => void): void => {
@@ -69,6 +72,7 @@ const main = async (): Promise<void> => {
   // ルーティング設定
   app.use("/", index)
   app.use("/users", users)
+  app.use("/auth", auth)
 
   // エラー処理
   app.use((request: Request, response: Response, next: NextFunction): void => {
