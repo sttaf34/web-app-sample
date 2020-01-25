@@ -4,6 +4,7 @@
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./build/",
+    "strictNullChecks": true,
     "emitDecoratorMetadata": true, // typeORM用の設定 https://typeorm.io/
     "experimentalDecorators": true // typeORM用の設定 https://typeorm.io/
   },
