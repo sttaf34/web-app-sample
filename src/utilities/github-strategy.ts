@@ -11,11 +11,10 @@ const githubStrategy = (): Strategy => {
   }
 
   const verify: VerifyFunctionWithRequest = (
-    req: express.Request,
+    request: express.Request,
     accessToken: string,
     refreshToken: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    profile: any,
+    profile: object,
     verified: VerifyCallback
   ): void => {
     process.nextTick((): void => {

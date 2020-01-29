@@ -44,7 +44,7 @@ const main = async (): Promise<void> => {
     session({
       resave: false,
       saveUninitialized: false,
-      secret: "secret"
+      secret: process.env.SESSION_SECRET || ""
     })
   )
 

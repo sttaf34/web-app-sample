@@ -6,7 +6,7 @@ const router = Router()
 router.get("/", (request: Request, response: Response) => {
   const message = request.flash()
 
-  // TODO: ログインの方式で request.user の型が異なるのを同処理するか
+  // TODO: ログインの方式で request.user の型が異なるのをどう処理するか
   if (typeof request.user === "object") {
     response.render("index", { user: "github", message: message.success })
   } else {
