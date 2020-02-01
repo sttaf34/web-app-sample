@@ -21,7 +21,7 @@ import auth from "./routes/auth"
 
 import connectFlash = require("connect-flash")
 
-const main = async (): Promise<void> => {
+export const createApp = async (): Promise<express.Express> => {
   const app = express()
 
   // request.body でデータを受け取る設定
@@ -73,19 +73,14 @@ const main = async (): Promise<void> => {
   app.use("/", index)
   app.use("/users", users)
   app.use("/auth", auth)
+  console.log(listEndpoints(app))
 
   // エラー処理
   app.use((request: Request, response: Response, next: NextFunction): void => {
     next(createHttpError(404))
   })
 
-  // サーバ起動
-  const port = process.env.PORT || 9700
-  app.listen(port, (): void => {
-    console.log(`listening on port ${port}!`)
-    console.log(listEndpoints(app))
-    console.log(process.env)
-  })
+  return app
 }
 
-main()
+export default createApp

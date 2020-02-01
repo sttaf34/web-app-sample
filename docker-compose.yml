@@ -17,7 +17,7 @@ services:
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
       SESSION_SECRET: ${SESSION_SECRET}
-    command: ./wait.sh npx ts-node-dev --poll src/app.ts
+    command: ./wait.sh npx ts-node-dev --poll src/bin/www
     volumes:
       - ./src:/home/circleci/application/src
       - ./__tests__:/home/circleci/application/__tests__
