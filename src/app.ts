@@ -2,10 +2,8 @@
 /* eslint-disable import/no-duplicates */
 
 import * as express from "express"
-import { Request, Response, NextFunction } from "express"
 import * as session from "express-session"
 import * as helmet from "helmet"
-import * as createHttpError from "http-errors"
 import * as listEndpoints from "express-list-endpoints"
 import * as path from "path"
 
@@ -19,6 +17,10 @@ import index from "./routes/index"
 import signup from "./routes/signup"
 import users from "./routes/users"
 import auth from "./routes/auth"
+import error from "./routes/error"
+
+import logger from "./middlewares/logger"
+import errorHander from "./middlewares/error-hander"
 
 import connectFlash = require("connect-flash")
 
@@ -70,17 +72,19 @@ export const createApp = async (): Promise<express.Express> => {
     }
   )
 
+  // ミドルウェア設定
+  app.use(logger)
+
   // ルーティング設定
   app.use("/", index)
   app.use("/signup", signup)
   app.use("/users", users)
   app.use("/auth", auth)
+  app.use("/error", error)
   console.log(listEndpoints(app))
 
-  // エラー処理
-  app.use((request: Request, response: Response, next: NextFunction): void => {
-    next(createHttpError(404))
-  })
+  // エラー処理ミドルウェア設定
+  app.use(errorHander)
 
   return app
 }

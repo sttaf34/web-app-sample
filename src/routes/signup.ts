@@ -1,15 +1,15 @@
 /* eslint-disable no-console */
 
-import * as express from "express"
+import { Router, Request, Response, NextFunction } from "express"
 import User, { UserCreateResult } from "../entities/user"
 
-const router = express.Router()
+const router = Router()
 
-router.get("/", (request: express.Request, response: express.Response) => {
+router.get("/", (request: Request, response: Response) => {
   response.render("signup")
 })
 
-router.post("/", (request: express.Request, response: express.Response) => {
+router.post("/", (request: Request, response: Response, next: NextFunction) => {
   const { name, password, age } = request.body
 
   User.createNewUser(name, password, age)
@@ -31,8 +31,7 @@ router.post("/", (request: express.Request, response: express.Response) => {
       }
     })
     .catch((error: Error): void => {
-      console.log("Error!", error)
-      response.redirect("/") // TODO: 現状不親切
+      next(error)
     })
 })
 
