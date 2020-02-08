@@ -7,6 +7,12 @@ import {
 } from "typeorm"
 import * as bcrypt from "bcrypt"
 
+export enum UserCreateResult {
+  Success,
+  ErrorPasswordShort,
+  ErrorOther
+}
+
 @Entity()
 @Unique(["name"])
 export class User extends BaseEntity {
@@ -30,11 +36,37 @@ export class User extends BaseEntity {
     if (user === undefined) {
       return undefined
     }
-    const isOK = await bcrypt.compareSync(password, user.password)
+    const isOK = bcrypt.compareSync(password, user.password)
     if (isOK) {
       return user
     }
     return undefined
+  }
+
+  public static createNewUser = async (
+    name: string,
+    password: string,
+    age: number
+  ): Promise<UserCreateResult> => {
+    // TODO: バリデート追加
+    if (password.length < 3) {
+      return UserCreateResult.ErrorPasswordShort
+    }
+
+    const salt = bcrypt.genSaltSync()
+    const hash = bcrypt.hashSync(password, salt)
+
+    const user = new User()
+    user.name = name
+    user.password = hash
+    user.age = age
+
+    try {
+      await user.save()
+      return UserCreateResult.Success
+    } catch (error) {
+      return UserCreateResult.ErrorOther
+    }
   }
 }
 

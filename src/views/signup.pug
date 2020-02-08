@@ -1,0 +1,15 @@
+doctype html
+html(lang="ja")
+  head
+    meta(charset="UTF-8")
+    title 新規登録
+  body
+    span 新規登録
+    form(method="post" action="/signup")
+      input(type="text" name="name" value="")
+      br
+      input(type="password" name="password" value="")
+      br
+      input(type="text" name="age" value="")
+      br
+      button(type="submit") submit

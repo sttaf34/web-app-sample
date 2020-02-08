@@ -16,6 +16,7 @@ import localStrategy from "./utilities/local-strategy"
 import githubStrategy from "./utilities/github-strategy"
 
 import index from "./routes/index"
+import signup from "./routes/signup"
 import users from "./routes/users"
 import auth from "./routes/auth"
 
@@ -71,6 +72,7 @@ export const createApp = async (): Promise<express.Express> => {
 
   // ルーティング設定
   app.use("/", index)
+  app.use("/signup", signup)
   app.use("/users", users)
   app.use("/auth", auth)
   console.log(listEndpoints(app))
