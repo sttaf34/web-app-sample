@@ -7,6 +7,11 @@ import {
 } from "typeorm"
 import * as bcrypt from "bcrypt"
 
+export enum UserNotFindResult {
+  WrongName,
+  WrongPassword
+}
+
 export enum UserCreateResult {
   Success,
   ErrorPasswordShort,
@@ -31,16 +36,30 @@ export class User extends BaseEntity {
   public static findOneByNameAndPassword = async (
     name: string,
     password: string
-  ): Promise<User | undefined> => {
+  ): Promise<User | UserNotFindResult> => {
+    // User.findOne() が reject されると
+    // ↓
+    // User.findOneByNameAndPassword() が reject される
+    // ↓
+    // 途中で一度も catch してないが、最終的にデフォルトエラーハンドラーに渡る
     const user = await User.findOne({ name })
+
     if (user === undefined) {
-      return undefined
+      return new Promise((resolve: (UserNotFindResult) => void): void => {
+        return resolve(UserNotFindResult.WrongName)
+      })
     }
+
     const isOK = bcrypt.compareSync(password, user.password)
     if (isOK) {
-      return user
+      return new Promise((resolve: (User) => void): void => {
+        return resolve(user)
+      })
     }
-    return undefined
+
+    return new Promise((resolve: (UserNotFindResult) => void): void => {
+      return resolve(UserNotFindResult.WrongPassword)
+    })
   }
 
   public static createNewUser = async (
