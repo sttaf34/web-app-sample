@@ -6,6 +6,7 @@
     "bcrypt": "^3.0.7",
     "connect-flash": "^0.1.1",
     "express": "^4.17.1",
+    "express-async-handler": "^1.1.4",
     "express-list-endpoints": "^4.0.1",
     "express-session": "^1.17.0",
     "helmet": "^3.21.2",
