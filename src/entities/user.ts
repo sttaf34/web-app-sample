@@ -5,12 +5,19 @@ import {
   Column,
   BaseEntity
 } from "typeorm"
+import { validate, IsPositive } from "class-validator"
+
 import * as bcrypt from "bcrypt"
+
+export enum UserNotFindResult {
+  WrongName,
+  WrongPassword
+}
 
 export enum UserCreateResult {
   Success,
-  ErrorPasswordShort,
-  ErrorOther
+  ErrorShortPassword,
+  ErrorWrongAge
 }
 
 @Entity()
@@ -26,21 +33,36 @@ export class User extends BaseEntity {
   password: string
 
   @Column()
+  @IsPositive()
   age: number
 
   public static findOneByNameAndPassword = async (
     name: string,
     password: string
-  ): Promise<User | undefined> => {
+  ): Promise<User | UserNotFindResult> => {
+    // User.findOne() が reject されると
+    // ↓
+    // User.findOneByNameAndPassword() が reject される
+    // ↓
+    // 途中で一度も catch してないが、最終的にデフォルトエラーハンドラーに渡る
     const user = await User.findOne({ name })
+
     if (user === undefined) {
-      return undefined
+      return new Promise((resolve: (UserNotFindResult) => void): void => {
+        return resolve(UserNotFindResult.WrongName)
+      })
     }
+
     const isOK = bcrypt.compareSync(password, user.password)
     if (isOK) {
-      return user
+      return new Promise((resolve: (User) => void): void => {
+        return resolve(user)
+      })
     }
-    return undefined
+
+    return new Promise((resolve: (UserNotFindResult) => void): void => {
+      return resolve(UserNotFindResult.WrongPassword)
+    })
   }
 
   public static createNewUser = async (
@@ -48,25 +70,29 @@ export class User extends BaseEntity {
     password: string,
     age: number
   ): Promise<UserCreateResult> => {
-    // TODO: バリデート追加
-    if (password.length < 3) {
-      return UserCreateResult.ErrorPasswordShort
+    // TODO: 定数クラスを作って、そちらに定義
+    if (password.length < 8) {
+      return new Promise((resolve: (UserCreateResult) => void): void => {
+        return resolve(UserCreateResult.ErrorShortPassword)
+      })
     }
-
-    const salt = bcrypt.genSaltSync()
-    const hash = bcrypt.hashSync(password, salt)
 
     const user = new User()
     user.name = name
-    user.password = hash
-    user.age = age
+    user.password = bcrypt.hashSync(password, bcrypt.genSaltSync())
+    user.age = Number(age)
 
-    try {
-      await user.save()
-      return UserCreateResult.Success
-    } catch (error) {
-      return UserCreateResult.ErrorOther
+    const errors = await validate(user)
+    if (errors.length > 0) {
+      return new Promise((resolve: (UserCreateResult) => void): void => {
+        return resolve(UserCreateResult.ErrorWrongAge)
+      })
     }
+
+    await user.save()
+    return new Promise((resolve: (UserCreateResult) => void): void => {
+      return resolve(UserCreateResult.Success)
+    })
   }
 }
 

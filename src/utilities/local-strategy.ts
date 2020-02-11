@@ -25,18 +25,19 @@ const localStrategy = (): Strategy => {
       options?: IVerifyOptions
     ) => void
   ): void => {
-    process.nextTick((): void => {
-      User.findOneByNameAndPassword(username, password)
-        .then((user: User | undefined) => {
-          if (user === undefined) {
-            return done(null, false, { message: "見つかりませんでした" })
-          }
-          return done(null, user.name, { message: "認証しました" })
-        })
-        .catch((error: Error) => {
-          return done(error, false, { message: "何かが間違っています" })
-        })
-    })
+    process.nextTick(
+      async (): Promise<void> => {
+        const userOrResult = await User.findOneByNameAndPassword(
+          username,
+          password
+        )
+        if (userOrResult instanceof User) {
+          return done(null, userOrResult.name, { message: "認証しました" })
+        }
+        const message = `見つかりませんでした ${userOrResult}`
+        return done(null, false, { message })
+      }
+    )
   }
 
   return new Strategy(option, verify)

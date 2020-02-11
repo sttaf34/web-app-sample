@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 
 import { Router, Request, Response, NextFunction } from "express"
+import * as asyncHandler from "express-async-handler"
 import User, { UserCreateResult } from "../entities/user"
 
 const router = Router()
@@ -9,30 +10,28 @@ router.get("/", (request: Request, response: Response) => {
   response.render("signup")
 })
 
-router.post("/", (request: Request, response: Response, next: NextFunction) => {
-  const { name, password, age } = request.body
+router.post(
+  "/",
+  asyncHandler(async (request: Request, response: Response) => {
+    // TODO: ここを型で守る必要がある
+    const { name, password, age } = request.body
 
-  User.createNewUser(name, password, age)
-    .then((result: UserCreateResult): void => {
-      switch (result) {
-        case UserCreateResult.Success:
-          response.redirect("../login")
-          break
-        case UserCreateResult.ErrorPasswordShort:
-          console.log("パスワードが短い！")
-          response.redirect("/") // TODO: 現状不親切
-          break
-        case UserCreateResult.ErrorOther:
-          console.log("何かしらエラー")
-          response.redirect("/") // TODO: 現状不親切
-          break
-        default:
-          break
-      }
-    })
-    .catch((error: Error): void => {
-      next(error)
-    })
-})
+    const result = await User.createNewUser(name, password, age)
+    switch (result) {
+      case UserCreateResult.Success:
+        console.log("OK!")
+        response.redirect("../login")
+        break
+      case UserCreateResult.ErrorShortPassword:
+        response.redirect("/")
+        break
+      case UserCreateResult.ErrorWrongAge:
+        response.redirect("/")
+        break
+      default:
+        break
+    }
+  })
+)
 
 export default router
